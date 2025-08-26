@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Product Factory 🏭</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4a6cf7, #6a11cb);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .free-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #00d4aa;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        
+        .lang-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: transparent;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .lang-btn.active {
+            background: white;
+            color: #4a6cf7;
+            border-color: white;
+        }
+        
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .main-content {
+            padding: 40px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 30px;
+            gap: 5px;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            color: #666;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .nav-tab.active {
+            background: white;
+            color: #4a6cf7;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .input-section {
+            background: #f8f9ff;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4a6cf7;
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .free-ai-section {
+            background: linear-gradient(135deg, #e8f7ff, #fff8e1);
+            border: 2px solid #00d4aa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .free-ai-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            color: #00a085;
+        }
+        
+        .free-ai-header h3 {
+            margin-left: 10px;
+        }
+        
+        .ai-provider-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        
+        .ai-provider {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e1e5e9;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .ai-provider:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .ai-provider.active {
+            border-color: #00d4aa;
+            background: #f0fff4;
+        }
+        
+        .provider-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .provider-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #2ed573;
+            animation: pulse 2s infinite;
+        }
+        
+        .provider-description {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .provider-limits {
+            font-size: 12px;
+            color: #00a085;
+            font-weight: 600;
+        }
+        
+        .start-btn {
+            background: linear-gradient(135deg, #4a6cf7, #6a11cb);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(74, 108, 247, 0.4);
+        }
+        
+        .start-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress-section {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .progress-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .progress-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            padding: 8px 16px;
+            border: 2px solid #e1e5e9;
+            background: white;
+            color: #666;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            background: #f8f9ff;
+            border-color: #4a6cf7;
+            color: #4a6cf7;
+        }
+        
+        .overall-progress {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #e1e5e9;
+        }
+        
+        .progress-bar-container {
+            position: relative;
+            background: #e1e5e9;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #4a6cf7, #6a11cb);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 6px;
+            position: relative;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 25%, rgba(255,255,255,0.2) 25%, rgba(255,255,255,0.2) 50%, transparent 50%, transparent 75%, rgba(255,255,255,0.2) 75%);
+            background-size: 20px 20px;
+            animation: progressAnimation 1s linear infinite;
+        }
+        
+        @keyframes progressAnimation {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 0; }
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .eta-text {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .progress-item {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-item.active {
+            border-color: #4a6cf7;
+            background: #f8f9ff;
+        }
+        
+        .progress-item.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 25%, rgba(74, 108, 247, 0.05) 25%, rgba(74, 108, 247, 0.05) 50%, transparent 50%, transparent 75%, rgba(74, 108, 247, 0.05) 75%);
+            background-size: 20px 20px;
+            animation: shimmer 2s linear infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 0; }
+        }
+        
+        .progress-item.completed {
+            border-color: #2ed573;
+            background: #f0fff4;
+        }
+        
+        .progress-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .progress-icon.waiting {
+            background: #e1e5e9;
+            color: #666;
+        }
+        
+        .progress-icon.active {
+            background: #4a6cf7;
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .progress-icon.completed {
+            background: #2ed573;
+            color: white;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 108, 247, 0.7); }
+            50% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(74, 108, 247, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 108, 247, 0); }
+        }
+        
+        .progress-text-content {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .progress-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .progress-desc {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .step-duration {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 12px;
+            color: #999;
+            z-index: 1;
+        }
+        
+        .status-indicators {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .status-chip {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .status-chip.success {
+            background: #e8f5e8;
+            color: #2ed573;
+        }
+        
+        .status-chip.processing {
+            background: #fff8e1;
+            color: #ffa502;
+        }
+        
+        .status-chip.waiting {
+            background: #f1f3f4;
+            color: #666;
+        }
+        
+        .results-section {
+            display: none;
+            background: #f0fff4;
+            border: 2px solid #2ed573;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .results-section h3 {
+            color: #2ed573;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        
+        .download-btn, .marketplace-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 30px;
+            margin: 10px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+        }
+        
+        .download-btn {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .marketplace-btn {
+            background: #2ed573;
+            color: white;
+        }
+        
+        .download-btn:hover, .marketplace-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .sample-data {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .sample-card {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .sample-card:hover {
+            border-color: #4a6cf7;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .sample-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .sample-desc {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            min-width: 300px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #2ed573;
+        }
+        
+        .notification.error {
+            background: #ff4757;
+        }
+        
+        .notification.info {
+            background: #4a6cf7;
+        }
+        
+        .notification.warning {
+            background: #ffa502;
+        }
+        
+        .generated-content {
+            display: none;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e1e5e9;
+        }
+        
+        .content-stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4a6cf7;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .lang-switcher {
+                position: static;
+                justify-content: center;
+                margin-top: 20px;
+            }
+            
+            .free-badge {
+                position: static;
+                display: inline-block;
+                margin-bottom: 15px;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .ai-provider-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .notification {
+                left: 20px;
+                right: 20px;
+                transform: translateY(-100%);
+            }
+            
+            .notification.show {
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="free-badge">✨ 100% FREE</div>
+            <div class="lang-switcher">
+                <button class="lang-btn active" onclick="switchLanguage('en')">🇺🇸 EN</button>
+                <button class="lang-btn" onclick="switchLanguage('th')">🇹🇭 TH</button>
+            </div>
+            
+            <h1 data-lang-en="🏭 Digital Product Factory" data-lang-th="🏭 โรงงานผลิตสินค้าดิจิทัล">🏭 Digital Product Factory</h1>
+            <p data-lang-en="Free AI-Powered Digital Product Creation & Sales" data-lang-th="สร้างและขายสินค้าดิจิทัลด้วย AI ฟรี 100%">Free AI-Powered Digital Product Creation & Sales</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="switchTab('create')"><i class="fas fa-pen"></i> <span data-lang-en="Create Product" data-lang-th="สร้างสินค้า">Create Product</span></button>
+                <button class="nav-tab" onclick="switchTab('ai')"><i class="fas fa-robot"></i> <span data-lang-en="Free AI Settings" data-lang-th="ตั้งค่า AI ฟรี">Free AI Settings</span></button>
+                <button class="nav-tab" onclick="switchTab('help')"><i class="fas fa-lightbulb"></i> <span data-lang-en="Quick Setup" data-lang-th="คู่มือตั้งค่า">Quick Setup</span></button>
+            </div>
+            
+            <!-- Create Product Tab -->
+            <div class="tab-content active" id="create-tab">
+                <div class="input-section">
+                    <h2 data-lang-en="📝 Create Your Digital Product" data-lang-th="📝 สร้างสินค้าดิจิทัลของคุณ">📝 Create Your Digital Product</h2>
+                    
+                    <div class="sample-data">
+                        <div class="sample-card" onclick="loadSample(0)">
+                            <div class="sample-title" data-lang-en="📱 Social Media Marketing Guide" data-lang-th="📱 คู่มือการตลาดโซเชียลมีเดีย">📱 Social Media Marketing Guide</div>
+                            <div class="sample-desc" data-lang-en="Complete Instagram & TikTok strategy for 2024" data-lang-th="กลยุทธ์ Instagram และ TikTok สำหรับปี 2024">Complete Instagram & TikTok strategy for 2024</div>
+                        </div>
+                        <div class="sample-card" onclick="loadSample(1)">
+                            <div class="sample-title" data-lang-en="💰 Cryptocurrency Investment" data-lang-th="💰 การลงทุนคริปโตเคอร์เรนซี">💰 Cryptocurrency Investment</div>
+                            <div class="sample-desc" data-lang-en="Beginner's guide to crypto trading and DeFi" data-lang-th="คู่มือมือใหม่สำหรับเทรด crypto และ DeFi">Beginner's guide to crypto trading and DeFi</div>
+                        </div>
+                        <div class="sample-card" onclick="loadSample(2)">
+                            <div class="sample-title" data-lang-en="🎯 Email Marketing Mastery" data-lang-th="🎯 การตลาดอีเมลขั้นเทพ">🎯 Email Marketing Mastery</div>
+                            <div class="sample-desc" data-lang-en="Build email lists and convert subscribers" data-lang-th="สร้างลิสต์อีเมลและเปลี่ยนผู้ติดตามเป็นลูกค้า">Build email lists and convert subscribers</div>
+                        </div>
+                    </div>
+                    
+                    <form id="productForm">
+                        <div class="form-group">
+                            <label for="title" data-lang-en="Product Title *" data-lang-th="ชื่อสินค้า *">Product Title *</label>
+                            <input type="text" id="title" required placeholder="e.g., Ultimate Facebook Ads Guide 2024">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="prompt" data-lang-en="Content Prompt *" data-lang-th="คำสั่งสร้างเนื้อหา *">Content Prompt *</label>
+                            <textarea id="prompt" required placeholder="Describe what content you want to generate..."></textarea>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                            <div class="form-group">
+                                <label for="category" data-lang-en="Category" data-lang-th="หมวดหมู่">Category</label>
+                                <select id="category">
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Business">Business</option>
+                                    <option value="Technology">Technology</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="Health">Health</option>
+                                    <option value="Education">Education</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="price" data-lang-en="Price ($)" data-lang-th="ราคา (บาท)">Price ($)</label>
+                                <input type="number" id="price" value="29" min="1">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="tags" data-lang-en="Tags" data-lang-th="แท็ก">Tags</label>
+                                <input type="text" id="tags" placeholder="marketing,ads,facebook">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="start-btn" id="startBtn"><i class="fas fa-rocket"></i> <span data-lang-en="Start Production" data-lang-th="เริ่มผลิต">Start Production</span></button>
+                    </form>
+                </div>
+                
+                <div class="generated-content" id="generatedContent">
+                    <h3 data-lang-en="Generated Content Preview" data-lang-th="ตัวอย่างเนื้อหาที่สร้าง">Generated Content Preview</h3>
+                    <div id="contentPreview"></div>
+                    <div class="content-stats" id="contentStats" style="display: none;">
+                        <div class="stat-item">
+                            <div class="stat-number" id="wordCount">0</div>
+                            <div class="stat-label" data-lang-en="Words" data-lang-th="คำ">Words</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="pageCount">0</div>
+                            <div class="stat-label" data-lang-en="Pages" data-lang-th="หน้า">Pages</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="readTime">0</div>
+                            <div class="stat-label" data-lang-en="Min Read" data-lang-th="นาทีอ่าน">Min Read</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="progress-section" id="progressSection">
+                    <div class="progress-header">
+                        <h2 data-lang-en="⚡ Production Pipeline" data-lang-th="⚡ สายการผลิต">⚡ Production Pipeline</h2>
+                        <div class="progress-controls">
+                            <button class="control-btn" id="pauseBtn" onclick="pauseProduction()"><i class="fas fa-pause"></i> Pause</button>
+                            <button class="control-btn" id="cancelBtn" onclick="cancelProduction()"><i class="fas fa-stop"></i> Cancel</button>
+                        </div>
+                    </div>
+                    
+                    <div class="overall-progress">
+                        <div class="progress-text">
+                            <span id="overallStatus">Initializing...</span>
+                            <span><span id="currentStep">0</span> / <span id="totalSteps">4</span></span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="overallProgress"></div>
+                        </div>
+                        <div class="eta-text">
+                            <span data-lang-en="Estimated time remaining: " data-lang-th="เวลาที่เหลือประมาณ: ">Estimated time remaining: </span>
+                            <span id="etaTime">Calculating...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-item" id="step1">
+                        <div class="progress-icon waiting">1</div>
+                        <div class="progress-text-content">
+                            <div class="progress-title">
+                                <span data-lang-en="Content Generation" data-lang-th="สร้างเนื้อหา">Content Generation</span>
+                                <div class="status-chip waiting" id="status1">
+                                    <i class="fas fa-clock"></i>
+                                    <span data-lang-en="Waiting" data-lang-th="รอ">Waiting</span>
+                                </div>
+                            </div>
+                            <div class="progress-desc" data-lang-en="Free AI is writing your digital product content..." data-lang-th="AI ฟรีกำลังเขียนเนื้อหาสินค้าดิจิทัลของคุณ...">Free AI is writing your digital product content...</div>
+                        </div>
+                        <div class="step-duration">~2 min</div>
+                    </div>
+                    
+                    <div class="progress-item" id="step2">
+                        <div class="progress-icon waiting">2</div>
+                        <div class="progress-text-content">
+                            <div class="progress-title">
+                                <span data-lang-en="PDF Creation" data-lang-th="สร้าง PDF">PDF Creation</span>
+                                <div class="status-chip waiting" id="status2">
+                                    <i class="fas fa-clock"></i>
+                                    <span data-lang-en="Waiting" data-lang-th="รอ">Waiting</span>
+                                </div>
+                            </div>
+                            <div class="progress-desc" data-lang-en="Formatting content into professional PDF..." data-lang-th="จัดรูปแบบเนื้อหาเป็น PDF แบบมืออาชีพ...">Formatting content into professional PDF...</div>
+                        </div>
+                        <div class="step-duration">~30 sec</div>
+                    </div>
+                    
+                    <div class="progress-item" id="step3">
+                        <div class="progress-icon waiting">3</div>
+                        <div class="progress-text-content">
+                            <div class="progress-title">
+                                <span data-lang-en="Quality Check" data-lang-th="ตรวจสอบคุณภาพ">Quality Check</span>
+                                <div class="status-chip waiting" id="status3">
+                                    <i class="fas fa-clock"></i>
+                                    <span data-lang-en="Waiting" data-lang-th="รอ">Waiting</span>
+                                </div>
+                            </div>
+                            <div class="progress-desc" data-lang-en="Reviewing content quality and formatting..." data-lang-th="ตรวจสอบคุณภาพเนื้อหาและรูปแบบ...">Reviewing content quality and formatting...</div>
+                        </div>
+                        <div class="step-duration">~15 sec</div>
+                    </div>
+                    
+                    <div class="progress-item" id="step4">
+                        <div class="progress-icon waiting">4</div>
+                        <div class="progress-text-content">
+                            <div class="progress-title">
+                                <span data-lang-en="Finalization" data-lang-th="เสร็จสิ้น">Finalization</span>
+                                <div class="status-chip waiting" id="status4">
+                                    <i class="fas fa-clock"></i>
+                                    <span data-lang-en="Waiting" data-lang-th="รอ">Waiting</span>
+                                </div>
+                            </div>
+                            <div class="progress-desc" data-lang-en="Product is ready for download and sales!" data-lang-th="สินค้าพร้อมดาวน์โหลดและขายแล้ว!">Product is ready for download and sales!</div>
+                        </div>
+                        <div class="step-duration">~5 sec</div>
+                    </div>
+                </div>
+                
+                <div class="results-section" id="resultsSection">
+                    <h3 data-lang-en="🎉 Your Digital Product is Ready!" data-lang-th="🎉 สินค้าดิจิทัลของคุณพร้อมแล้ว!">🎉 Your Digital Product is Ready!</h3>
+                    <p data-lang-en="Your product has been successfully created using free AI technology." data-lang-th="สินค้าของคุณถูกสร้างเรียบร้อยแล้วด้วยเทคโนโลยี AI ฟรี">Your product has been successfully created using free AI technology.</p>
+                    
+                    <div>
+                        <button class="download-btn" id="downloadBtn" onclick="downloadPDF()"><i class="fas fa-download"></i> <span data-lang-en="Download PDF" data-lang-th="ดาวน์โหลด PDF">Download PDF</span></button>
+                        <button class="preview-btn download-btn" onclick="showPreview()"><i class="fas fa-eye"></i> <span data-lang-en="Preview Content" data-lang-th="ดูตัวอย่างเนื้อหา">Preview Content</span></button>
+                        <button class="download-btn" onclick="createNewProduct()" style="background: #00d4aa;"><i class="fas fa-plus"></i> <span data-lang-en="Create Another" data-lang-th="สร้างอีกหนึ่งชิ้น">Create Another</span></button>
+                    </div>
+                    
+                    <div id="productStats" style="margin-top: 20px; font-size: 14px; color: #666;"></div>
+                </div>
+            </div>
+            
+            <!-- Free AI Settings Tab -->
+            <div class="tab-content" id="ai-tab">
+                <div class="free-ai-section">
+                    <div class="free-ai-header">
+                        <span style="font-size: 24px;">🤖</span>
+                        <h3 data-lang-en="Free AI Content Generation" data-lang-th="สร้างเนื้อหาด้วย AI ฟรี">Free AI Content Generation</h3>
+                    </div>
+                    
+                    <div class="ai-provider-grid">
+                        <div class="ai-provider active" id="local-ai" onclick="selectAIProvider('local')">
+                            <div class="provider-title">
+                                <div style="display: flex; align-items: center;">
+                                    <div class="provider-status"></div>
+                                    <span data-lang-en="Local AI Generator" data-lang-th="AI Generator ในเครื่อง">Local AI Generator</span>
+                                </div>
+                            </div>
+                            <div class="provider-description" data-lang-en="Built-in AI content generator with pre-trained templates" data-lang-th="ตัวสร้างเนื้อหา AI ในตัวพร้อมเทมเพลตที่ฝึกไว้แล้ว">Built-in AI content generator with pre-trained templates</div>
+                            <div class="provider-limits" data-lang-en="✓ Unlimited usage ✓ No API keys needed ✓ Works offline" data-lang-th="✓ ใช้ได้ไม่จำกัด ✓ ไม่ต้องมี API keys ✓ ใช้ได้แม้ไม่มีเน็ต">✓ Unlimited usage ✓ No API keys needed ✓ Works offline</div>
+                        </div>
+                        
+                        <div class="ai-provider" id="huggingface-ai" onclick="selectAIProvider('huggingface')">
+                            <div class="provider-title">
+                                <div style="display: flex; align-items: center;">
+                                    <div class="provider-status"></div>
+                                    <span data-lang-en="HuggingFace Free API" data-lang-th="HuggingFace API ฟรี">HuggingFace Free API</span>
+                                </div>
+                            </div>
+                            <div class="provider-description" data-lang-en="Free access to various open-source language models" data-lang-th="เข้าถึงโมเดลภาษาโอเพนซอร์สต่างๆ ฟรี">Free access to various open-source language models</div>
+                            <div class="provider-limits" data-lang-en="✓ 1,000 requests/month ✓ Multiple models ✓ High quality" data-lang-th="✓ 1,000 คำขอต่อเดือน ✓ หลายโมเดล ✓ คุณภาพสูง">✓ 1,000 requests/month ✓ Multiple models ✓ High quality</div>
+                        </div>
+                        
+                        <div class="ai-provider" id="cohere-ai" onclick="selectAIProvider('cohere')">
+                            <div class="provider-title">
+                                <div style="display: flex; align-items: center;">
+                                    <div class="provider-status"></div>
+                                    <span data-lang-en="Cohere Free Tier" data-lang-th="Cohere แพลนฟรี">Cohere Free Tier</span>
+                                </div>
+                            </div>
+                            <div class="provider-description" data-lang-en="Professional AI content generation with free tier" data-lang-th="สร้างเนื้อหา AI ระดับมืออาชีพด้วยแพลนฟรี">Professional AI content generation with free tier</div>
+                            <div class="provider-limits" data-lang-en="✓ 100 requests/month ✓ Commercial use ✓ API key required" data-lang-th="✓ 100 คำขอต่อเดือน ✓ ใช้เชิงพาณิชย์ได้ ✓ ต้องมี API key">✓ 100 requests/month ✓ Commercial use ✓ API key required</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <div class="form-group" id="apiKeySection" style="display: none;">
+                            <label for="freeApiKey" data-lang-en="API Key (Optional)" data-lang-th="API Key (ไม่บังคับ)">API Key (Optional)</label>
+                            <input type="password" id="freeApiKey" placeholder="Enter your free API key here...">
+                            <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                                <span data-lang-en="Only required for external AI providers. Local AI works without any keys." data-lang-th="จำเป็นเฉพาะสำหรับ AI ภายนอกเท่านั้น Local AI ใช้งานได้โดยไม่ต้องมี keys">Only required for external AI providers. Local AI works without any keys.</span>
+                            </div>
+                        </div>
+                        
+                        <div class="status-indicators" id="aiStatusIndicators">
+                            <div class="status-chip success">
+                                <i class="fas fa-check-circle"></i>
+                                <span data-lang-en="Local AI Ready" data-lang-th="Local AI พร้อม">Local AI Ready</span>
+                            </div>
+                            <div class="status-chip waiting">
+                                <i class="fas fa-clock"></i>
+                                <span id="usageCount">0/∞ requests used today</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="start-btn" style="width: auto; padding: 12px 30px;" onclick="testCurrentAI()"><i class="fas fa-flask"></i> <span data-lang-en="Test AI Generation" data-lang-th="ทดสอบการสร้าง AI">Test AI Generation</span></button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Help Tab -->
+            <div class="tab-content" id="help-tab">
+                <div class="free-ai-section">
+                    <div class="free-ai-header">
+                        <span style="font-size: 24px;">💡</span>
+                        <h3 data-lang-en="How to Get Started (100% Free)" data-lang-th="วิธีเริ่มต้นใช้งาน (ฟรี 100%)">How to Get Started (100% Free)</h3>
+                    </div>
+                    
+                    <div class="ai-provider-grid">
+                        <div class="ai-provider">
+                            <div class="provider-title">
+                                <span style="margin-right: 8px;">🚀</span>
+                                <span data-lang-en="Option 1: Use Local AI" data-lang-th="ตัวเลือก 1: ใช้ Local AI">Option 1: Use Local AI</span>
+                            </div>
+                            <p data-lang-en="No setup required! Built-in AI templates work immediately." data-lang-th="ไม่ต้องตั้งค่าอะไร! เทมเพลต AI ในตัวใช้งานได้ทันที">No setup required! Built-in AI templates work immediately.</p>
+                            <div style="margin-top: 10px; padding: 10px; background: #e8f5e8; border-radius: 5px; font-size: 12px;">
+                                <strong data-lang-en="Best for: Beginners, Quick testing" data-lang-th="เหมาะสำหรับ: มือใหม่, ทดสอบรวดเร็ว">Best for: Beginners, Quick testing</strong>
+                            </div>
+                        </div>
+                        
+                        <div class="ai-provider">
+                            <div class="provider-title">
+                                <span style="margin-right: 8px;">🤗</span>
+                                <span data-lang-en="Option 2: HuggingFace (Free)" data-lang-th="ตัวเลือก 2: HuggingFace (ฟรี)">Option 2: HuggingFace (Free)</span>
+                            </div>
+                            <p data-lang-en="1. Sign up at huggingface.co/join  2. No payment required for free tier" data-lang-th="1. สมัครที่ huggingface.co/join  2. ไม่ต้องจ่ายเงินสำหรับแพลนฟรี">1. Sign up at huggingface.co/join<br>2. No payment required for free tier</p>
+                            <div style="margin-top: 10px; padding: 10px; background: #fff8e1; border-radius: 5px; font-size: 12px;">
+                                <strong data-lang-en="Best for: High quality content, Multiple models" data-lang-th="เหมาะสำหรับ: เนื้อหาคุณภาพสูง, หลายโมเดล">Best for: High quality content, Multiple models</strong>
+                            </div>
+                        </div>
+                        
+                        <div class="ai-provider">
+                            <div class="provider-title">
+                                <span style="margin-right: 8px;">🔮</span>
+                                <span data-lang-en="Option 3: Cohere (Free)" data-lang-th="ตัวเลือก 3: Cohere (ฟรี)">Option 3: Cohere (Free)</span>
+                            </div>
+                            <p data-lang-en="1. Visit cohere.ai and sign up  2. Get free API key instantly" data-lang-th="1. ไปที่ cohere.ai และสมัคร  2. รับ API key ฟรีทันที">1. Visit cohere.ai and sign up<br>2. Get free API key instantly</p>
+                            <div style="margin-top: 10px; padding: 10px; background: #f0f8ff; border-radius: 5px; font-size: 12px;">
+                                <strong data-lang-en="Best for: Professional content, Commercial use" data-lang-th="เหมาะสำหรับ: เนื้อหาระดับมืออาชีพ, ใช้เชิงพาณิชย์">Best for: Professional content, Commercial use</strong>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: #f8f9ff; border-radius: 10px;">
+                        <h4 data-lang-en="🎯 Quick Start Guide" data-lang-th="🎯 คู่มือเริ่มต้นอย่างรวดเร็ว">🎯 Quick Start Guide</h4>
+                        <ol style="margin: 15px 0; padding-left: 20px; line-height: 1.8;">
+                            <li data-lang-en="Fill in your product title and description" data-lang-th="กรอกชื่อและรายละเอียดสินค้าของคุณ">Fill in your product title and description</li>
+                            <li data-lang-en="Choose your preferred AI (Local AI works immediately)" data-lang-th="เลือก AI ที่คุณต้องการ (Local AI ใช้งานได้ทันที)">Choose your preferred AI (Local AI works immediately)</li>
+                            <li data-lang-en="Click 'Start Production' and watch the magic happen!" data-lang-th="คลิก 'เริ่มผลิต' และดูเวทมนตร์เกิดขึ้น!">Click 'Start Production' and watch the magic happen!</li>
+                            <li data-lang-en="Download your professional PDF product" data-lang-th="ดาวน์โหลดสินค้า PDF ระดับมืออาชีพของคุณ">Download your professional PDF product</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText"></span>
+    </div>
+    
+    <script>
+        // Global variables
+        let generatedContent = '';
+        let currentLanguage = 'en';
+        let currentAIProvider = 'local';
+        let productionPaused = false;
+        let productionCancelled = false;
+        let usageCount = 0;
+        let productionStartTime = 0;
+        
+        // Free AI content templates
+        const contentTemplates = {
+            'Marketing': {
+                introduction: "In today's competitive digital landscape, effective marketing strategies are crucial for business success. This comprehensive guide will walk you through proven techniques and cutting-edge approaches that deliver real results.",
+                sections: [
+                    "Understanding Your Target Audience",
+                    "Digital Marketing Fundamentals",
+                    "Content Marketing Strategies", 
+                    "Social Media Marketing",
+                    "Email Marketing Best Practices",
+                    "Analytics and Performance Tracking",
+                    "Advanced Marketing Techniques",
+                    "Future Trends and Predictions"
+                ],
+                tips: [
+                    "Always start with clear, measurable goals",
+                    "Know your audience better than they know themselves",
+                    "Consistency is key across all marketing channels",
+                    "Data-driven decisions always outperform gut feelings",
+                    "Test everything - small changes can yield big results"
+                ]
+            },
+            'Business': {
+                introduction: "Building a successful business requires more than just a great idea. This guide provides you with the essential knowledge, strategies, and tools needed to transform your vision into a thriving enterprise.",
+                sections: [
+                    "Business Planning and Strategy",
+                    "Market Research and Analysis",
+                    "Financial Management",
+                    "Operations and Systems",
+                    "Leadership and Team Building",
+                    "Customer Acquisition and Retention",
+                    "Growth Strategies",
+                    "Risk Management and Compliance"
+                ],
+                tips: [
+                    "Start with solving a real problem people are willing to pay for",
+                    "Cash flow is the lifeblood of any business",
+                    "Build systems and processes for everything",
+                    "Hire slow, fire fast when it comes to team building",
+                    "Focus on customer success - everything else follows"
+                ]
+            },
+            'Technology': {
+                introduction: "Technology continues to reshape how we work, communicate, and live. This comprehensive guide explores the latest technological trends, tools, and strategies that are driving innovation across industries.",
+                sections: [
+                    "Emerging Technology Trends",
+                    "Digital Transformation Strategies",
+                    "Cybersecurity Best Practices",
+                    "Cloud Computing Solutions",
+                    "Artificial Intelligence and Machine Learning",
+                    "Mobile and Web Development",
+                    "Data Management and Analytics",
+                    "Future Technology Predictions"
+                ],
+                tips: [
+                    "Stay curious and never stop learning",
+                    "Security should be built in, not bolted on",
+                    "User experience is more important than technical features",
+                    "Automate repetitive tasks to focus on creative work",
+                    "Always have a backup plan for critical systems"
+                ]
+            }
+        };
+        
+        // Language switching function
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('[data-lang-en]').forEach(el => {
+                if (lang === 'en') {
+                    el.textContent = el.getAttribute('data-lang-en');
+                } else if (lang === 'th') {
+                    el.textContent = el.getAttribute('data-lang-th');
+                }
+            });
+            
+            document.querySelectorAll('input[data-lang-en], textarea[data-lang-en]').forEach(el => {
+                if (lang === 'en') {
+                    el.placeholder = el.getAttribute('data-lang-en');
+                } else if (lang === 'th') {
+                    el.placeholder = el.getAttribute('data-lang-th');
+                }
+            });
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.querySelector(`.lang-btn[onclick="switchLanguage('${lang}')"]`).classList.add('active');
+            
+            showNotification(lang === 'en' ? '🇺🇸 Language switched to English' : '🇹🇭 เปลี่ยนภาษาเป็นไทยแล้ว', 'success');
+        }
+        
+        // Tab switching function
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            document.querySelector(`.nav-tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        }
+        
+        // AI Provider selection
+        function selectAIProvider(provider) {
+            currentAIProvider = provider;
+            
+            document.querySelectorAll('.ai-provider').forEach(p => {
+                p.classList.remove('active');
+            });
+            
+            document.getElementById(`${provider}-ai`).classList.add('active');
+            
+            // Show/hide API key section
+            if (provider === 'local') {
+                document.getElementById('apiKeySection').style.display = 'none';
+                updateAIStatus('success', 'Local AI Ready', '0/∞ requests used today');
+            } else {
+                document.getElementById('apiKeySection').style.display = 'block';
+                updateAIStatus('waiting', `${provider} selected`, 'API key required');
+            }
+            
+            showNotification(`AI Provider switched to ${provider}`, 'info');
+        }
+        
+        // Update AI status indicators
+        function updateAIStatus(type, status, usage) {
+            const indicators = document.getElementById('aiStatusIndicators');
+            indicators.innerHTML = `
+                <div class="status-chip ${type}">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'processing' ? 'fa-spinner fa-spin' : 'fa-clock'}"></i>
+                    <span>${status}</span>
+                </div>
+                <div class="status-chip waiting">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>${usage}</span>
+                </div>
+            `;
+        }
+        
+        // Sample data loading function
+        function loadSample(index) {
+            const samples = [
+                {
+                    title: 'Social Media Marketing Mastery 2024',
+                    prompt: 'Create a comprehensive social media marketing guide covering Instagram, TikTok, Facebook, and YouTube strategies. Include content creation tips, engagement techniques, hashtag strategies, influencer collaboration, analytics tracking, and monetization methods for 2024.',
+                    category: 'Marketing',
+                    price: 29,
+                    tags: 'social media,instagram,tiktok,marketing,content creation'
+                },
+                {
+                    title: 'Cryptocurrency Investment Guide for Beginners',
+                    prompt: 'Write a beginner-friendly cryptocurrency investment guide covering Bitcoin, Ethereum, altcoins, DeFi protocols, wallet security, exchange selection, technical analysis basics, risk management, and long-term investment strategies.',
+                    category: 'Finance',
+                    price: 39,
+                    tags: 'cryptocurrency,bitcoin,investment,defi,blockchain'
+                },
+                {
+                    title: 'Email Marketing Conversion Mastery',
+                    prompt: 'Develop a complete email marketing guide with list building strategies, segmentation techniques, automation workflows, copywriting formulas, A/B testing methods, deliverability optimization, and conversion rate improvement tactics.',
+                    category: 'Marketing',
+                    price: 27,
+                    tags: 'email marketing,automation,conversion,copywriting'
+                }
+            ];
+            
+            const sample = samples[index];
+            document.getElementById('title').value = sample.title;
+            document.getElementById('prompt').value = sample.prompt;
+            document.getElementById('category').value = sample.category;
+            document.getElementById('price').value = sample.price;
+            document.getElementById('tags').value = sample.tags;
+            
+            showNotification('✨ Sample data loaded successfully!', 'success');
+        }
+        
+        // Enhanced notification function
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            const icons = {
+                'success': 'fas fa-check-circle',
+                'error': 'fas fa-exclamation-triangle',
+                'info': 'fas fa-info-circle',
+                'warning': 'fas fa-exclamation-circle'
+            };
+            
+            notification.querySelector('i').className = icons[type] || icons['info'];
+            notificationText.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+        
+        // Free AI content generation function
+        async function generateFreeContent(title, prompt, category) {
+            const template = contentTemplates[category] || contentTemplates['Marketing'];
+            
+            // Simulate AI processing delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            let content = `# ${title}\n\n`;
+            content += `${template.introduction}\n\n`;
+            
+            // Add sections based on the prompt
+            template.sections.forEach((section, index) => {
+                content += `## ${index + 1}. ${section}\n\n`;
+                content += generateSectionContent(section, prompt) + '\n\n';
+            });
+            
+            // Add tips section
+            content += `## Key Takeaways\n\n`;
+            template.tips.forEach((tip, index) => {
+                content += `${index + 1}. ${tip}\n`;
+            });
+            
+            content += `\n\n---\n*Generated with AI Technology*`;
+            
+            return content;
+        }
+        
+        // Generate section content based on prompt keywords
+        function generateSectionContent(sectionTitle, prompt) {
+            const keywords = prompt.toLowerCase().split(' ');
+            const relevantKeywords = keywords.filter(word => word.length > 4);
+            
+            let content = `This section covers essential aspects of ${sectionTitle.toLowerCase()}. `;
+            content += `Based on current industry trends and best practices, `;
+            content += `here are the key strategies you need to implement:\n\n`;
+            
+            // Generate bullet points
+            const points = [
+                `Understanding the fundamentals of ${sectionTitle.toLowerCase()} is crucial for success`,
+                `Implement proven strategies that align with your business goals`,
+                `Monitor key performance indicators to track progress`,
+                `Stay updated with latest trends and adapt accordingly`,
+                `Focus on providing value to your target audience`
+            ];
+            
+            points.forEach(point => {
+                content += `• ${point}\n`;
+            });
+            
+            content += `\nRemember to customize these strategies based on your specific needs and target audience.`;
+            
+            return content;
+        }
+        
+        // Enhanced production simulation with better status tracking
+        async function startProduction() {
+            if (!validateForm()) return;
+            
+            const title = document.getElementById('title').value.trim();
+            const prompt = document.getElementById('prompt').value.trim();
+            const category = document.getElementById('category').value;
+            
+            // Reset production state
+            productionPaused = false;
+            productionCancelled = false;
+            productionStartTime = Date.now();
+            
+            // Show progress section
+            document.getElementById('progressSection').style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('generatedContent').style.display = 'none';
+            
+            // Disable start button
+            const startBtn = document.getElementById('startBtn');
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Processing...</span>';
+            
+            // Reset progress
+            resetProgress();
+            
+            try {
+                await simulateEnhancedProduction(title, prompt, category);
+            } catch (error) {
+                showNotification(`❌ Production failed: ${error.message}`, 'error');
+                resetProductionButton();
+            }
+        }
+        
+        // Enhanced production simulation with real-time updates
+        async function simulateEnhancedProduction(title, prompt, category) {
+            const steps = [
+                { id: 'step1', name: 'Content Generation', duration: 8000 },
+                { id: 'step2', name: 'PDF Creation', duration: 2000 },
+                { id: 'step3', name: 'Quality Check', duration: 1500 },
+                { id: 'step4', name: 'Finalization', duration: 1000 }
+            ];
+            
+            const totalDuration = steps.reduce((sum, step) => sum + step.duration, 0);
+            let elapsed = 0;
+            
+            for (let i = 0; i < steps.length; i++) {
+                if (productionCancelled) {
+                    showNotification('Production cancelled by user', 'warning');
+                    resetProductionButton();
+                    return;
+                }
+                
+                const step = steps[i];
+                await processStep(step, i, steps.length, elapsed, totalDuration);
+                
+                // Special handling for content generation
+                if (i === 0) {
+                    try {
+                        generatedContent = await generateFreeContent(title, prompt, category);
+                        displayGeneratedContent();
+                        usageCount++;
+                        updateUsageDisplay();
+                    } catch (error) {
+                        showNotification('Content generation failed', 'error');
+                        resetProductionButton();
+                        return;
+                    }
+                }
+                
+                elapsed += step.duration;
+                
+                // Handle pause
+                while (productionPaused && !productionCancelled) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+            
+            // Show results
+            showResults();
+            resetProductionButton();
+        }
+        
+        // Process individual step with enhanced status updates
+        async function processStep(step, stepIndex, totalSteps, elapsed, totalDuration) {
+            const stepElement = document.getElementById(step.id);
+            const statusElement = document.getElementById(`status${stepIndex + 1}`);
+            const icon = stepElement.querySelector('.progress-icon');
+            
+            // Mark previous step as completed
+            if (stepIndex > 0) {
+                const prevStep = document.getElementById(steps[stepIndex - 1].id);
+                const prevStatus = document.getElementById(`status${stepIndex}`);
+                const prevIcon = prevStep.querySelector('.progress-icon');
+                
+                prevStep.classList.remove('active');
+                prevStep.classList.add('completed');
+                prevIcon.classList.remove('active');
+                prevIcon.classList.add('completed');
+                prevIcon.innerHTML = '<i class="fas fa-check"></i>';
+                
+                prevStatus.className = 'status-chip success';
+                prevStatus.innerHTML = '<i class="fas fa-check"></i><span>Completed</span>';
+            }
+            
+            // Activate current step
+            stepElement.classList.add('active');
+            icon.classList.remove('waiting');
+            icon.classList.add('active');
+            
+            statusElement.className = 'status-chip processing';
+            statusElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Processing</span>';
+            
+            // Update overall progress
+            updateOverallProgress(stepIndex + 1, totalSteps, step.name, elapsed + step.duration, totalDuration);
+            
+            // Show notification
+            showNotification(`Processing: ${step.name}...`, 'info');
+            
+            // Simulate work with progress updates
+            const updateInterval = step.duration / 20;
+            for (let progress = 0; progress < step.duration; progress += updateInterval) {
+                if (productionCancelled) return;
+                
+                while (productionPaused && !productionCancelled) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, updateInterval));
+                
+                // Update step progress
+                const stepProgress = ((progress / step.duration) * 100).toFixed(0);
+                statusElement.innerHTML = `<i class="fas fa-spinner fa-spin"></i><span>Processing ${stepProgress}%</span>`;
+            }
+        }
+        
+        // Update overall progress bar and ETA
+        function updateOverallProgress(currentStep, totalSteps, currentTask, elapsed, totalDuration) {
+            const progress = (currentStep / totalSteps) * 100;
+            const remainingTime = Math.max(0, (totalDuration - elapsed) / 1000);
+            
+            document.getElementById('overallProgress').style.width = `${progress}%`;
+            document.getElementById('currentStep').textContent = currentStep;
+            document.getElementById('totalSteps').textContent = totalSteps;
+            document.getElementById('overallStatus').textContent = `Processing: ${currentTask}`;
+            
+            // Format ETA
+            if (remainingTime > 60) {
+                document.getElementById('etaTime').textContent = `${Math.ceil(remainingTime / 60)} min`;
+            } else {
+                document.getElementById('etaTime').textContent = `${Math.ceil(remainingTime)} sec`;
+            }
+        }
+        
+        // Display generated content with stats
+        function displayGeneratedContent() {
+            const preview = generatedContent.substring(0, 800) + (generatedContent.length > 800 ? '...' : '');
+            document.getElementById('contentPreview').innerHTML = `
+                <div style="max-height: 300px; overflow-y: auto; white-space: pre-line; line-height: 1.6; padding: 15px; background: #f8f9ff; border-radius: 8px; font-size: 14px;">
+                    ${preview}
+                </div>
+            `;
+            
+            // Calculate and display stats
+            const words = generatedContent.split(/\s+/).length;
+            const pages = Math.ceil(words / 250);
+            const readTime = Math.ceil(words / 200);
+            
+            document.getElementById('wordCount').textContent = words;
+            document.getElementById('pageCount').textContent = pages;
+            document.getElementById('readTime').textContent = readTime;
+            
+            document.getElementById('generatedContent').style.display = 'block';
+            document.getElementById('contentStats').style.display = 'flex';
+        }
+        
+        // Show final results
+        function showResults() {
+            document.getElementById('resultsSection').style.display = 'block';
+            
+            const words = generatedContent ? generatedContent.split(/\s+/).length : 0;
+            const pages = Math.ceil(words / 250);
+            const readTime = Math.ceil(words / 200);
+            const processingTime = ((Date.now() - productionStartTime) / 1000).toFixed(1);
+            
+            document.getElementById('productStats').innerHTML = `
+                <div style="display: flex; justify-content: center; gap: 30px; margin-top: 15px; flex-wrap: wrap;">
+                    <div style="text-align: center;"><strong>${words}</strong><br><small>Words</small></div>
+                    <div style="text-align: center;"><strong>${pages}</strong><br><small>Pages</small></div>
+                    <div style="text-align: center;"><strong>${readTime} min</strong><br><small>Read Time</small></div>
+                    <div style="text-align: center;"><strong>${processingTime}s</strong><br><small>Processing Time</small></div>
+                </div>
+            `;
+            
+            showNotification('Production completed successfully!', 'success');
+        }
+        
+        // Reset progress indicators
+        function resetProgress() {
+            document.querySelectorAll('.progress-item').forEach(item => {
+                item.classList.remove('active', 'completed');
+                const icon = item.querySelector('.progress-icon');
+                icon.classList.remove('active', 'completed');
+                icon.classList.add('waiting');
+                icon.textContent = icon.parentElement.parentElement.id.replace('step', '');
+            });
+            
+            // Reset status chips
+            for (let i = 1; i <= 4; i++) {
+                const status = document.getElementById(`status${i}`);
+                status.className = 'status-chip waiting';
+                status.innerHTML = '<i class="fas fa-clock"></i><span>Waiting</span>';
+            }
+            
+            // Reset overall progress
+            document.getElementById('overallProgress').style.width = '0%';
+            document.getElementById('overallStatus').textContent = 'Initializing...';
+            document.getElementById('currentStep').textContent = '0';
+            document.getElementById('etaTime').textContent = 'Calculating...';
+        }
+        
+        // Reset production button
+        function resetProductionButton() {
+            const startBtn = document.getElementById('startBtn');
+            startBtn.disabled = false;
+            startBtn.innerHTML = '<i class="fas fa-rocket"></i> <span data-lang-en="Start Production" data-lang-th="เริ่มผลิต">Start Production</span>';
+        }
+        
+        // Production control functions
+        function pauseProduction() {
+            productionPaused = !productionPaused;
+            const pauseBtn = document.getElementById('pauseBtn');
+            
+            if (productionPaused) {
+                pauseBtn.innerHTML = '<i class="fas fa-play"></i> Resume';
+                showNotification('Production paused', 'warning');
+            } else {
+                pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                showNotification('Production resumed', 'info');
+            }
+        }
+        
+        function cancelProduction() {
+            productionCancelled = true;
+            productionPaused = false;
+            
+            document.getElementById('progressSection').style.display = 'none';
+            resetProductionButton();
+            showNotification('Production cancelled', 'warning');
+        }
+        
+        // Update usage display
+        function updateUsageDisplay() {
+            const usageText = currentAIProvider === 'local' ? 
+                `${usageCount}/∞ requests used today` :
+                `${usageCount}/100 requests used today`;
+            
+            document.getElementById('usageCount').textContent = usageText;
+        }
+        
+        // Test current AI provider
+        async function testCurrentAI() {
+            showNotification('Testing AI generation...', 'info');
+            updateAIStatus('processing', 'Testing AI...', 'Running test');
+            
+            try {
+                const testContent = await generateFreeContent(
+                    'Test Product', 
+                    'Create a test product to verify AI functionality', 
+                    'Technology'
+                );
+                
+                if (testContent && testContent.length > 100) {
+                    updateAIStatus('success', `${currentAIProvider} AI Working`, `${usageCount}/∞ requests used`);
+                    showNotification('AI test successful!', 'success');
+                } else {
+                    throw new Error('Generated content too short');
+                }
+            } catch (error) {
+                updateAIStatus('error', 'AI Test Failed', error.message);
+                showNotification('AI test failed: ' + error.message, 'error');
+            }
+        }
+        
+        // Form validation
+        function validateForm() {
+            const title = document.getElementById('title').value.trim();
+            const prompt = document.getElementById('prompt').value.trim();
+            
+            if (!title) {
+                showNotification('Product title is required!', 'error');
+                return false;
+            }
+            
+            if (!prompt) {
+                showNotification('Content prompt is required!', 'error');
+                return false;
+            }
+            
+            if (title.length < 5) {
+                showNotification('Product title should be at least 5 characters long!', 'error');
+                return false;
+            }
+            
+            if (prompt.length < 20) {
+                showNotification('Content prompt should be at least 20 characters long!', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // PDF generation function
+        function generatePDF(title, content) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(20);
+            doc.setFont(undefined, 'bold');
+            doc.text(title, 20, 30);
+            
+            // Add subtitle
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'normal');
+            doc.text('Generated with Free AI Technology', 20, 40);
+            
+            // Add line
+            doc.line(20, 45, 190, 45);
+            
+            // Add content
+            doc.setFontSize(11);
+            const splitContent = doc.splitTextToSize(content.replace(/[#*]/g, ''), 170);
+            doc.text(splitContent, 20, 55);
+            
+            return doc;
+        }
+        
+        // Download PDF function
+        function downloadPDF() {
+            if (!generatedContent) {
+                showNotification('No content available to download!', 'error');
+                return;
+            }
+            
+            const title = document.getElementById('title').value || 'Digital Product';
+            const pdf = generatePDF(title, generatedContent);
+            
+            const fileName = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            pdf.save(`${fileName}.pdf`);
+            
+            showNotification('PDF downloaded successfully!', 'success');
+        }
+        
+        // Show preview function
+        function showPreview() {
+            if (!generatedContent) {
+                showNotification('No content available to preview!', 'error');
+                return;
+            }
+            
+            const title = document.getElementById('title').value || 'Sample Digital Product';
+            alert(`Preview: ${title}\n\n${generatedContent.substring(0, 500)}...`);
+        }
+        
+        // Create new product
+        function createNewProduct() {
+            // Reset form
+            document.getElementById('productForm').reset();
+            document.getElementById('price').value = 29;
+            
+            // Hide sections
+            document.getElementById('progressSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('generatedContent').style.display = 'none';
+            
+            // Clear generated content
+            generatedContent = '';
+            
+            // Switch to create tab
+            switchTab('create');
+            
+            showNotification('Ready to create a new product!', 'success');
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Product form submission
+            document.getElementById('productForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                startProduction();
+            });
+            
+            // Initialize language and AI provider
+            switchLanguage('en');
+            selectAIProvider('local');
+            
+            // Auto-save form data
+            const formElements = ['title', 'prompt', 'category', 'price', 'tags'];
+            formElements.forEach(elementId => {
+                const element = document.getElementById(elementId);
+                element.addEventListener('input', function() {
+                    localStorage.setItem(`dpf_${elementId}`, this.value);
+                });
+                
+                // Load saved data
+                const savedValue = localStorage.getItem(`dpf_${elementId}`);
+                if (savedValue) {
+                    element.value = savedValue;
+                }
+            });
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + Enter to start production
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                if (document.getElementById('create-tab').classList.contains('active')) {
+                    startProduction();
+                }
+            }
+            
+            // Space to pause/resume production
+            if (e.key === ' ' && document.getElementById('progressSection').style.display !== 'none') {
+                e.preventDefault();
+                pauseProduction();
+            }
+            
+            // Escape to cancel production
+            if (e.key === 'Escape' && document.getElementById('progressSection').style.display !== 'none') {
+                e.preventDefault();
+                cancelProduction();
+            }
+        });
+        
+        // Export functions for global access
+        window.switchLanguage = switchLanguage;
+        window.switchTab = switchTab;
+        window.loadSample = loadSample;
+        window.selectAIProvider = selectAIProvider;
+        window.testCurrentAI = testCurrentAI;
+        window.showPreview = showPreview;
+        window.downloadPDF = downloadPDF;
+        window.createNewProduct = createNewProduct;
+        window.pauseProduction = pauseProduction;
+        window.cancelProduction = cancelProduction;
+        window.startProduction = startProduction;
+        
+        // Initialize steps array for cancelProduction function
+        const steps = [
+            { id: 'step1', name: 'Content Generation', duration: 8000 },
+            { id: 'step2', name: 'PDF Creation', duration: 2000 },
+            { id: 'step3', name: 'Quality Check', duration: 1500 },
+            { id: 'step4', name: 'Finalization', duration: 1000 }
+        ];
+    </script>
+</body>
+</html>
